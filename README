@@ -1,0 +1,75 @@
+#### **README**
+<xaiArtifact artifact_id="readme-artifact" artifact_version_id="readme-version-1" title="README.md" content_type="text/markdown">
+```markdown
+# RTV Data Pipeline
+
+This project implements a data pipeline for the RTV Data Engineer Technical Assessment, Deliverable 1: Data Pipeline Architecture. It processes household survey CSVs (`01_baseline.csv`, `02_year_one.csv`, `03_year_two.csv`), stores them in MinIO, loads into PostgreSQL, and transforms into a star schema for analytics.
+
+## **Setup**
+
+### **Prerequisites**
+- Python 3.10+
+- Docker Desktop
+- Homebrew (macOS)
+
+### **Directory Structure**
+```
+project/
+├── docker-compose.yml
+├── venv/
+├── dags/
+│   └── pipeline.py
+├── data/
+│   ├── 01_baseline.csv
+│   ├── 02_year_one.csv
+│   ├── 03_year_two.csv
+├── logs/
+├── plugins/
+```
+
+### **Installation**
+1. **Create Virtual Environment**:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+2. **Install Dependencies**:
+   ```bash
+   pip install --upgrade pip
+   brew install abseil
+   export CC=/opt/homebrew/bin/clang
+   export CXX=/opt/homebrew/bin/clang++
+   pip install pandas minio psycopg2-binary apache-airflow==2.9.0
+   ```
+   If errors occur, try:
+   ```bash
+   pip install pandas minio psycopg2-binary apache-airflow==2.8.0
+   ```
+3. **Start Docker**:
+   ```bash
+   open -a Docker
+   docker-compose up -d
+   ```
+
+### **Running the Pipeline**
+1. Access Airflow: `http://localhost:8080` (login: `admin`/`admin`).
+2. Trigger the `rtv_pipeline` DAG.
+3. Verify outputs:
+   - MinIO: `http://localhost:9001` (login: `minioadmin`/`minioadmin`).
+   - PostgreSQL:
+     ```bash
+     psql -h localhost -U postgres -d rtv
+     SELECT * FROM fact_survey LIMIT 5;
+     ```
+
+### **Pipeline Overview**
+- **Ingestion**: Reads CSVs, validates `hhid_2`, saves to MinIO as Parquet.
+- **Staging**: Loads into PostgreSQL `staging_survey`.
+- **Transformation**: Populates star schema (`dim_household`, `dim_time`, `dim_respondent`, `fact_survey`, `fact_expenditure`, `fact_crop_yield`).
+- **Validation**: Checks duplicates and null rates.
+
+## **Troubleshooting**
+- **Pip Errors**: Share `pip install` output.
+- **Docker Issues**: Run `docker ps` and share results.
+- **Pipeline Failures**: Check `logs/*.log`.
+```

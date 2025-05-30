@@ -1,0 +1,8 @@
+venv
+logs/
+plugins/
+data/*.csv
+data/*.html
+*.parquet
+*.pyc
+dags/__pycache__
