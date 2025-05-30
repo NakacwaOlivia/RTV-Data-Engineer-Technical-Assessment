@@ -6,3 +6,5 @@ data/*.html
 *.parquet
 *.pyc
 dags/__pycache__
+.DS_Store
+# Ignore Python cache files
