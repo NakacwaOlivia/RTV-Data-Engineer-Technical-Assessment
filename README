@@ -1,75 +1,100 @@
-#### **README**
-<xaiArtifact artifact_id="readme-artifact" artifact_version_id="readme-version-1" title="README.md" content_type="text/markdown">
-```markdown
-# RTV Data Pipeline
+RTV Data Engineer Technical Assessment
+📌 Overview
+This repository contains the solution to the Raising The Village (RTV) Data Engineering Technical Assessment. The goal is to build a complete data pipeline and analytical dashboard to track poverty-related household progress using RTV’s longitudinal survey data.
 
-This project implements a data pipeline for the RTV Data Engineer Technical Assessment, Deliverable 1: Data Pipeline Architecture. It processes household survey CSVs (`01_baseline.csv`, `02_year_one.csv`, `03_year_two.csv`), stores them in MinIO, loads into PostgreSQL, and transforms into a star schema for analytics.
-
-## **Setup**
-
-### **Prerequisites**
-- Python 3.10+
-- Docker Desktop
-- Homebrew (macOS)
-
-### **Directory Structure**
-```
-project/
-├── docker-compose.yml
-├── venv/
-├── dags/
-│   └── pipeline.py
+📁 Repository Structure
+rtv-data-engineer-assessment/
 ├── data/
-│   ├── 01_baseline.csv
-│   ├── 02_year_one.csv
-│   ├── 03_year_two.csv
-├── logs/
-├── plugins/
-```
+│   ├── combined_data/                   # Provided datasets & collection tools
+├── notebooks/
+│   ├── exploratory_analysis.ipynb       # EDA and profiling
+├── pipeline/
+│   ├── ingestion/                       # Ingestion scripts
+│   ├── transformation/                 # Transformation logic
+│   └── orchestration/                  # Airflow / Prefect DAGs or workflow scripts
+├── warehouse/
+│   ├── schema.sql                       # DDL for data warehouse
+│   ├── models/                          # dbt or SQL models
+├── dashboard/
+│   ├── app.py                           # Streamlit/Dash/PowerBI logic
+├── docs/
+│   ├── architecture_diagram.png
+│   ├── design_document.md
+│   └── data_quality_report.md
+├── tests/
+│   ├── test_pipeline.py                 # Unit tests
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
+⚙️ Setup Instructions
+1. Clone the Repository
+git clone https://github.com/yourusername/rtv-data-engineer-assessment.git
+cd rtv-data-engineer-assessment
 
-### **Installation**
-1. **Create Virtual Environment**:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-2. **Install Dependencies**:
-   ```bash
-   pip install --upgrade pip
-   brew install abseil
-   export CC=/opt/homebrew/bin/clang
-   export CXX=/opt/homebrew/bin/clang++
-   pip install pandas minio psycopg2-binary apache-airflow==2.9.0
-   ```
-   If errors occur, try:
-   ```bash
-   pip install pandas minio psycopg2-binary apache-airflow==2.8.0
-   ```
-3. **Start Docker**:
-   ```bash
-   open -a Docker
-   docker-compose up -d
-   ```
+2. Create and Activate Virtual Environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
-### **Running the Pipeline**
-1. Access Airflow: `http://localhost:8080` (login: `admin`/`admin`).
-2. Trigger the `rtv_pipeline` DAG.
-3. Verify outputs:
-   - MinIO: `http://localhost:9001` (login: `minioadmin`/`minioadmin`).
-   - PostgreSQL:
-     ```bash
-     psql -h localhost -U postgres -d rtv
-     SELECT * FROM fact_survey LIMIT 5;
-     ```
+3. Launch Services via Docker
+docker-compose up --build
+PostgreSQL and MinIO will be initialized.
 
-### **Pipeline Overview**
-- **Ingestion**: Reads CSVs, validates `hhid_2`, saves to MinIO as Parquet.
-- **Staging**: Loads into PostgreSQL `staging_survey`.
-- **Transformation**: Populates star schema (`dim_household`, `dim_time`, `dim_respondent`, `fact_survey`, `fact_expenditure`, `fact_crop_yield`).
-- **Validation**: Checks duplicates and null rates.
+Airflow UI available at http://localhost:8080
 
-## **Troubleshooting**
-- **Pip Errors**: Share `pip install` output.
-- **Docker Issues**: Run `docker ps` and share results.
-- **Pipeline Failures**: Check `logs/*.log`.
-```
+4. Run the Pipeline
+Depending on the orchestration used:
+
+# If using Airflow
+airflow dags trigger rtv_pipeline
+Or run scripts manually for ingestion/transformation.
+
+🛠️ Technology Stack
+Python, Pandas, SQL
+
+PostgreSQL (Data Warehouse)
+
+MinIO (Object Storage)
+
+Apache Airflow or Prefect (Orchestration)
+
+dbt Core (Transformations)
+
+Streamlit
+
+Docker & Docker Compose
+
+📊 Dashboard
+The dashboard allows users to:
+
+View trends across Baseline, Year 1, and Year 2 surveys.
+
+Drill down by geography, household indicators, and derived metrics.
+
+Track progress on key poverty metrics over time.
+
+Launch with:
+streamlit run dashboard/app.py
+Or refer to the Power BI dashboard file in /dashboard/.
+
+✅ Data Quality & Validation
+Null/missing value checks
+
+Schema consistency checks across survey rounds
+
+Variable normalization across evolving schema
+
+Validation logic documented in docs/data_quality_report.md
+
+🔍 Testing
+Run unit tests:
+
+pytest tests/
+Includes:
+
+Ingestion tests
+
+Transformation logic
+
+Data quality validations
